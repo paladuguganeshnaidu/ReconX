@@ -1,0 +1,20 @@
+{
+  "target": "toriiminds.com",
+  "subdomains": [
+    "frs.toriiminds.com",
+    "toriiminds.com\nwww.toriiminds.com",
+    "*.toriiminds.com\ntoriiminds.com"
+  ],
+  "ports": [],
+  "headers": [
+    "frs.toriiminds.com ******",
+    "frs.toriiminds.com *******"
+  ],
+  "technologies": [
+    {
+      "target": "frs.toriiminds.com",
+      "server": "Microsoft-IIS/10.0"
+    }
+  ],
+  "directories": []
+}
