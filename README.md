@@ -1,174 +1,84 @@
 # ReconX
 
-ReconX is a Node.js reconnaissance CLI built for authorized security assessments.
-It automates early-stage offensive recon tasks and produces structured JSON reports that can be used for manual validation and deeper pentest workflows.
+ReconX is a Node.js reconnaissance CLI for **authorized security assessments**. It focuses on early attack-surface discovery and produces structured JSON reports for analyst review.
 
-## Positioning
+> ReconX is a recon tool, not an exploitation framework. Use it only against assets you own or are explicitly authorized to test.
 
-ReconX is designed for:
-- Ethical hacking labs
-- Internal red team simulations
-- Bug bounty recon on in-scope assets
-- Baseline attack surface mapping during pentests
+## What it does
 
-ReconX is not an exploitation framework. It focuses on discovery and signal collection.
+- Certificate-transparency subdomain discovery through crt.sh.
+- Lightweight common-subdomain expansion.
+- Nmap scanning with multiple profiles.
+- HTTP security-header checks.
+- Basic server-banner technology detection.
+- Local CVE correlation using a version-range database.
+- Common directory probing.
+- Timestamped JSON report generation.
 
-## Core Capabilities
+## Pipeline
 
-- Certificate transparency based subdomain collection from crt.sh
-- Common subdomain expansion for quick surface growth
-- Multi-target Nmap scanning with profile support
-- HTTP security header checks
-- Basic web technology fingerprinting via Server header
-- Lightweight CVE correlation using a local version-range database
-- Directory path probing for common endpoints
-- JSON report export in the reports folder
+Target → Subdomains → Nmap → Headers → Technology → CVE Correlation → Directory Probe → JSON Report.
 
-## Tech Stack
+## Technology
 
-- Runtime: Node.js (CommonJS)
-- Network requests: axios
-- CLI output styling: chalk
-- External scanner: nmap
+- Node.js.
+- CommonJS.
+- Axios.
+- Chalk.
+- Nmap.
 
-## Project Layout
+## Repository structure
 
-```text
-src/
-	main.js                 # CLI entrypoint
-	core/pipeline.js        # Orchestrates all recon stages
-	modules/
-		subdomain.js          # crt.sh + common-subdomain expansion
-		portscan.js           # Nmap profiles and execution
-		headers.js            # Security header checks
-		techdetect.js         # Server header fingerprinting
-		cvecheck.js           # Local CVE correlation from data/cves.txt
-		dirbruteforce.js      # Directory probing
-		port.js               # Legacy/simple nmap module
-	utils/
-		saver.js              # Writes timestamped JSON reports
-		logger.js             # Console helpers (currently not wired into pipeline)
-data/
-	cves.txt                # Local CVE mapping database
-reports/
-	demo.json               # Example report
-```
+- src/main.js — CLI entrypoint.
+- src/core/pipeline.js — orchestration.
+- src/modules/subdomain.js — subdomain collection.
+- src/modules/portscan.js — Nmap profiles.
+- src/modules/headers.js — security headers.
+- src/modules/techdetect.js — server-header fingerprinting.
+- src/modules/cvecheck.js — local CVE correlation.
+- src/modules/dirbruteforce.js — directory probing.
+- src/utils/saver.js — report persistence.
+- data/cves.txt — local CVE mapping data.
+- reports/ — generated/example reports.
 
-## Pipeline Flow
+## Install
 
-Current execution flow in pipeline.js:
+Requirements: Node.js 18+ and Nmap available on PATH.
 
-1. Enumerate subdomains
-2. Run Nmap in aggressive mode
-3. Check HTTP security headers
-4. Detect technology server banners
-5. Correlate possible CVEs from local DB
-6. Probe common web directories
-7. Save final report as JSON
+Install dependencies with npm install.
 
-## Requirements
+## Run
 
-Install before running:
+The documented entry point is:
 
-1. Node.js 18+ recommended
-2. Nmap available in PATH
-
-Quick checks:
-
-```bash
-node -v
-nmap --version
-```
-
-## Installation
-
-```bash
-git clone https://github.com/paladuguganeshnaidu/ReconX.git
-cd ReconX
-npm install
-```
-
-## Usage
-
-```bash
 node src/main.js <target-domain>
-```
 
-Example:
+Example: node src/main.js example.com
 
-```bash
-node src/main.js example.com
-```
+Reports are written under reports/.
 
-The run will generate a report file like:
+## Nmap profiles
 
-```text
-reports/report-1711182450123.json
-```
+The scanner currently supports fast, stealth, full, vuln, service and aggressive profiles. The current pipeline uses the aggressive profile by default.
 
-## Port Scan Profiles (Implemented)
+## Important limitations
 
-The scanner module supports multiple Nmap command profiles:
+- Some HTTP checks are HTTP-first rather than HTTPS-first.
+- Subdomain collection is intentionally lightweight.
+- CVE correlation is heuristic and should be treated as a lead, not proof of vulnerability.
+- Raw Nmap output remains part of the report for manual validation.
+- Concurrency/rate controls and richer structured parsing are future improvements.
 
-- fast: nmap -F
-- stealth: nmap -sS -T4
-- full: nmap -p-
-- vuln: nmap --script vuln
-- service: nmap -sV
-- aggressive: nmap -A
+## Safe use
 
-The current pipeline uses aggressive by default.
+Stay within written scope, respect bug-bounty program rules and avoid disruptive scans against production systems.
 
-## Report Structure
+## License
 
-Generated JSON includes:
-
-```json
-{
-	"target": "example.com",
-	"subdomains": [],
-	"ports": "<raw nmap output or [] on error>",
-	"headers": [],
-	"technologies": [
-		{
-			"target": "www.example.com",
-			"server": "nginx/1.20.1"
-		}
-	],
-	"cves": [],
-	"directories": []
-}
-```
-
-## Current Scope and Practical Notes
-
-- HTTP probing uses http:// in multiple modules. HTTPS-first handling is not yet implemented.
-- Subdomain enumeration is intentionally lightweight and capped.
-- CVE correlation is heuristic and should be treated as low-confidence lead generation.
-- Nmap results are stored as raw stdout for analyst review.
-
-## Legal and Ethical Use
-
-Use ReconX only against systems you own or have explicit written authorization to test.
-
-You are responsible for:
-- Staying within legal scope
-- Respecting program rules in bug bounty engagements
-- Avoiding disruption to production services
-
-Unauthorized scanning may violate law and policy.
-
-## Roadmap Ideas
-
-- HTTPS fallback and TLS-aware header checks
-- Better subdomain normalization and deduplication
-- Structured parsing of Nmap output
-- Concurrency controls and rate limiting
-- Severity scoring and confidence tuning for CVE findings
-- Optional output formats (CSV/Markdown)
+See the repository license if present. Do not assume third-party Nmap/CVE/data content is covered by the project license.
 
 ## Author
 
 Paladugu Ganesh Naidu
 
-If this project helps your recon workflow, consider starring the repository.
+Repository: https://github.com/paladuguganeshnaidu/ReconX
